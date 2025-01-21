@@ -3,13 +3,15 @@ const cors = require('cors');
 require('dotenv').config();
 
 const pool =require('./database');
+
+const app = express();
 // const router = express.Router();
 const productsRouter = require('./routes/products');
 const userRouter = require('./routes/users');
 
-const app = express();
 
-app.use(express.json)
+
+app.use(express.json())
 app.use(cors());
 
 
