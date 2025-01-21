@@ -3,28 +3,31 @@ const cors = require('cors');
 require('dotenv').config();
 
 const pool =require('./database');
-const router = express.Router();
+// const router = express.Router();
 const productsRouter = require('./routes/products');
-const userRoutes = require('./routes/users');
+const userRouter = require('./routes/users');
 
 const app = express();
 
 app.use(express.json)
 app.use(cors());
 
-//calling the routes for all options
-app.use('/api/products', productsRouter);
-app.use('/api/users', userRoutes);
 
-app.get('/', (req,res) => {
-    res.json({message: "Welcome to the Api "})
+
+app.get('/', async (req,res) => {
+
+    const [products] = await pool.query("SELECT * FROM products");
+
+    res.json({
+        message: "Welcome to the Api ",
+        products
+    })
 });
 
-router.get('/', (req, res) => {
-    res.json({ message: "Get all products" });
-  });
 
-module.exports = router;
+//calling the routes for all options
+app.use('/api/products', productsRouter);
+app.use('/api/users', userRouter);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () =>{

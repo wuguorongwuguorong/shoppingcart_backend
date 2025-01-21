@@ -4,7 +4,20 @@ async function getUserByEmail(email) {
   if (!email || typeof email !== 'string') {
     throw new Error('Invalid email');
   }
-  const [rows] = await pool.query('SELECT * FROM users WHERE email = ?', [email]);
+  try {
+    const [rows] = await pool.query('SELECT * FROM users WHERE email = ?', [email]);
+    return rows[0];
+  } catch (e) {
+    console.log(e);
+    throw e;
+  }
+}
+
+async function getUserById(id) {
+  if (!id || typeof id !== 'number') {
+      throw new Error('Invalid user ID');
+  }
+  const [rows] = await pool.query('SELECT * FROM users WHERE id = ?', [id]);
   return rows[0];
 }
 
@@ -64,11 +77,11 @@ async function updateUser(id, { name, email, password, salutation, country, mark
   if (!id || !email || !password || typeof id !== 'number' || typeof email !== 'string' || typeof password !== 'string') {
     throw new Error('Invalid user data');
   }
-  
+
   const connection = await pool.getConnection();
   try {
     await connection.beginTransaction();
-    
+
     // Update user data
     await connection.query(
       `UPDATE users SET name = ?, email = ?, password = ?, salutation = ?, country = ? WHERE id = ?`,
@@ -85,7 +98,7 @@ async function updateUser(id, { name, email, password, salutation, country, mark
         );
       }
     }
-    
+
     await connection.commit();
   } catch (error) {
     await connection.rollback();
@@ -95,8 +108,35 @@ async function updateUser(id, { name, email, password, salutation, country, mark
   }
 }
 
+async function deleteUser(id) {
+  if (!id || typeof id !== 'number') {
+      throw new Error('Invalid user ID');
+  }
+
+  const connection = await pool.getConnection();
+  try {
+      await connection.beginTransaction();
+
+      // Delete marketing preferences
+      await connection.query(`DELETE FROM user_marketing_preferences WHERE user_id = ?`, [id]);
+
+      // Delete user
+      await connection.query(`DELETE FROM users WHERE id = ?`, [id]);
+
+      await connection.commit();
+  } catch (error) {
+      await connection.rollback();
+      throw error;
+  } finally {
+      connection.release();
+  }
+}
+
+
 module.exports = {
   getUserByEmail,
+  getUserById,
   createUser,
-  updateUser
+  updateUser,
+  deleteUser
 };
