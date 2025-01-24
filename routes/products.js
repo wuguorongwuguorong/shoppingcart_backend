@@ -2,6 +2,20 @@ const express = require('express');
 const router = express.Router();
 const productService = require('../services/productService');
 
+
+//create product
+router.post('/create', async (req, res) => {
+  try {
+
+    // Register user with the new payload structure
+    const productId = await productService.createProduct(req.body);
+
+    res.status(201).json({ message: "Products successfully", productId });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+});
+
 // GET all products
 router.get('/', async (req, res) => {
   try {

@@ -8,6 +8,7 @@ const app = express();
 // const router = express.Router();
 const productsRouter = require('./routes/products');
 const userRouter = require('./routes/users');
+const cartRoutes = require('./routes/cart');
 
 
 
@@ -30,6 +31,7 @@ app.get('/', async (req,res) => {
 //calling the routes for all options
 app.use('/api/products', productsRouter);
 app.use('/api/users', userRouter);
+app.use('/api/cart', cartRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () =>{
